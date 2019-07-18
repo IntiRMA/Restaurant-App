@@ -79,6 +79,7 @@ export class RandomScreen extends React.Component {
                      if(restaurants.length>0) {
                          let idx = Math.floor((Math.random() * restaurants.length));
                          This.setState({rest: restaurants[idx]});
+                         This.props.navigation.navigate("Randoms",{items:restaurants,tags:tgs});
                      }
                  }).catch(err => console.log(err));
 

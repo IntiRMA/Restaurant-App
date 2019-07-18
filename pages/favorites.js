@@ -18,14 +18,21 @@ class FavoritesScreen extends React.Component{
     }
 
     renderBox(item){
+        var city="";
+        try {
+            city = item.location.city;
+        }catch (e) {
+            city="";
+        }
         return (
-            <ImageBackground source={require('../resources/burger.png')} style={containers.itemContainer}>
-                <TouchableOpacity style={buttonStyles.itemButton}
-                    onPress={()=>this.props.navigation.navigate("Show",{item:item})}
+            <ImageBackground source={""} style={containers.itemContainer}>
+                <TouchableOpacity  style={buttonStyles.itemButton}
+                                   onPress={()=>this.props.navigation.navigate("Show",{item:item})}
                 >
-                    <View style={containers.textContainer}>
-                    <Text style={tetxStyles.itemText}>{item.name}</Text>
-                    </View>
+                    <Text style={tetxStyles.blackTextSmall}>Name:</Text>
+                    <Text style={tetxStyles.blackTextSmall}>{item.name}</Text>
+                    <Text style={tetxStyles.blackTextSmall}>City:</Text>
+                    <Text style={tetxStyles.blackTextSmall}>{city}</Text>
                 </TouchableOpacity>
             </ImageBackground>
         );

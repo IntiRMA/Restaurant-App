@@ -5,6 +5,7 @@ import StarRating from 'react-native-star-rating';
 import uploadToDb from'../services/uploadToDb';
 import {LoadingScreen} from "./loading";
 import {connect} from "react-redux";
+import loadFromDb from "../services/loadFromDb"
 class ShowRestaurantScreen extends React.Component{
     constructor(){
         super();
@@ -14,14 +15,17 @@ class ShowRestaurantScreen extends React.Component{
             city:"",
             tags:[],
             address:"",
-            price:"",
+            price:["$","$$","$$$","$$$$"],
             loading:true,
             uploaderId:0
         }
     }
     componentDidMount() {
-        let favs=[];
+
+        let favs=loadFromDb.getUserFavorites().catch();
+        this.setState({favorites:favs});
         let item = this.props.navigation.state.params.item;
+        console.log(JSON.stringify(item,null,2));
         let contains=false;
             for (let i=0;i<favs.length;i++) {
                 let fav=favs[i];
@@ -33,12 +37,7 @@ class ShowRestaurantScreen extends React.Component{
 
         this.setState({
                 favorite: true,
-                rating: item.user_rating.aggregate_rating,
-                name: item.name,
-                city: item.location.city,
-                tags: item.cuisines,
-                address: item.location.address,
-                price: item.price_range,
+                item:item,
                 loading: false,
             path:contains ? require('../resources/starFilled.png'):require('../resources/starEmpty.png'),
             }
@@ -47,13 +46,13 @@ class ShowRestaurantScreen extends React.Component{
     }
 
     addFav(){
-        uploadToDb.addToUserFavorites(this.state.city,this.state.name).catch();
+        uploadToDb.addToUserFavorites(this.state.item).catch();
         this.setState({path:require('../resources/starFilled.png')});
         let favs=[];
-        for(let i=0;i<this.props.favorites.length;i++){
-            favs.push(this.props.favorites[i]);
+        for(let i=0;i<this.state.favorites.length;i++){
+            favs.push(this.state.favorites[i]);
         }
-        favs.push({name:this.state.name,city:this.state.city});
+        favs.push(this.state.item);
         this.props.add({favorites:favs});
     }
     render(){
@@ -64,22 +63,22 @@ class ShowRestaurantScreen extends React.Component{
         return(
           <View style={{alignItems:'center'}}>
               <Text style={textStyles.blackTextSmall}>name:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.name}</Text>
+              <Text style={textStyles.pageTitle}>{this.state.item.name}</Text>
 
               <Text style={textStyles.blackTextSmall}>city:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.city}</Text>
+              <Text style={textStyles.pageTitle}>{this.state.item.location.city}</Text>
 
               <Text style={textStyles.blackTextSmall}>rating:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.rating}</Text>
+              <Text style={textStyles.pageTitle}>{this.state.item.user_rating.aggregate_rating}</Text>
 
               <Text style={textStyles.blackTextSmall}>price:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.price}</Text>
+              <Text style={textStyles.pageTitle}>{this.state.price[Number(this.state.item.price_range)-1]}</Text>
 
               <Text style={textStyles.blackTextSmall}>address:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.address}</Text>
+              <Text style={textStyles.pageTitle}>{this.state.item.location.address}</Text>
 
-              <Text style={textStyles.blackTextSmall}>tags:</Text>
-              <Text style={textStyles.pageTitle}>{this.state.tags.toString()}</Text>
+              <Text style={textStyles.blackTextSmall}>cuisines:</Text>
+              <Text style={textStyles.pageTitle}>{this.state.item.cuisines}</Text>
 
               <ImageBackground source={This.state.path} style={{width: 50,height:50}}>
                 <TouchableOpacity style={{width: 50,height:50}}

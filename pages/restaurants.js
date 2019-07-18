@@ -16,6 +16,7 @@ class RestaurantScreen extends React.Component{
             refresh:false,
             loading:false,
             items: [],
+            notSearch:true
         };
         this.renderBox.bind(this);
         this.onSearch.bind(this);
@@ -35,13 +36,11 @@ class RestaurantScreen extends React.Component{
                 lon:lon,
                 q:search
             }).then(result=> {
-                console.log(JSON.stringify(result,null,2));
                 for (let k in result.restaurants) {
-                    console.log(result.restaurants[k].restaurant.name);
                     items.push(result.restaurants[k].restaurant);
 
                 }
-                This.setState({items: items});
+                This.setState({items: items,notSearch:false});
 
             }).catch(err=>console.log(err));
 
@@ -57,6 +56,7 @@ class RestaurantScreen extends React.Component{
     }
 
     renderBox(item){
+
         return (
             <ImageBackground source={""} style={containers.itemContainer}>
                 <TouchableOpacity  style={buttonStyles.itemButton}
@@ -74,29 +74,55 @@ class RestaurantScreen extends React.Component{
         if(this.state.loading){
             return <LoadingScreen/>;
         }
-        return (
+        if(this.state.notSearch){
+            return (
 
-            <View style={containers.standardView}>
-                <Search
-                    ref="search_box"
-                    onSearch={search=>this.onSearch(search)}
-                    /**
-                    * There many props that can customizable
-                    * Please scroll down to Props section
-                    */
-                />
-                <View style={containers.listContainer}>
-                    <FlatList
-                        refreshing={this.state.refresh}
-                        onRefresh={()=>this.refresh()}
-                        numColumns={2}
-                        extraData={this.state.items}
-                        renderItem={({item})=>this.renderBox(item)}
-                        data={this.state.items}
-                        initialNumToRender={5}/>
+                <View style={containers.standardView}>
+                    <Search
+                        ref="search_box"
+                        onSearch={search => this.onSearch(search)}
+                        /**
+                        * There many props that can customizable
+                        * Please scroll down to Props section
+                        */
+                    />
+                    <View style={containers.listContainer}>
+                        <FlatList
+                            refreshing={this.state.refresh}
+                            onRefresh={() => this.refresh()}
+                            numColumns={2}
+                            extraData={this.props.items}
+                            renderItem={({item}) => this.renderBox(item)}
+                            data={this.props.items}
+                            initialNumToRender={5}/>
+                    </View>
                 </View>
-            </View>
-        );
+            );
+        }else {
+            return (
+
+                <View style={containers.standardView}>
+                    <Search
+                        ref="search_box"
+                        onSearch={search => this.onSearch(search)}
+                        /**
+                        * There many props that can customizable
+                        * Please scroll down to Props section
+                        */
+                    />
+                    <View style={containers.listContainer}>
+                        <FlatList
+                            refreshing={this.state.refresh}
+                            onRefresh={() => this.refresh()}
+                            numColumns={2}
+                            extraData={this.state.items}
+                            renderItem={({item}) => this.renderBox(item)}
+                            data={this.state.items}
+                            initialNumToRender={5}/>
+                    </View>
+                </View>
+            );
+        }
     }
 }
 

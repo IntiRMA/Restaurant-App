@@ -13,20 +13,12 @@ const reducer=(state=initstate,action)=>{
     switch (action.type) {
       case 'LOAD_ALL':
         return {regions:action.items.regions,favorites:action.items.favorites,uploads:action.items.uploads,restaurants:action.items.restaurants};
-      case 'ADD':
-        let favs=state.favorites.slice();
-        let regions=state.regions.slice();
-        let uploads=action.items.uploads;
-        let restaurants=action.items.restaurants;
-        if(regions.includes(restaurants[restaurants.length-1].city)){
-          regions.push(restaurants[restaurants.length-1].city);
-        }
-        return {regions:regions,favorites:favs,uploads:uploads,restaurants:restaurants};
       case "ADD_FAV":
-        let regs=state.regions.slice();
-        let ups=state.uploads.slice();
-        let rest=state.restaurants.slice();
-        return {regions:regs,favorites:action.items.favorites,uploads:ups,restaurants:rest};
+        var favs=state.favorites;
+        for(let rest of action.items.favorites){
+          favs.push(rest);
+        }
+        return {favorites:favs};
     }
   }
   return state;
