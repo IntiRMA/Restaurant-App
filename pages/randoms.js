@@ -29,7 +29,6 @@ export class RandomsScreen extends React.Component{
         return new Promise((resolve, reject) => {
             for(let i=0;i<this.state.items.length;i++){
                 if(this.state.items[i].name.includes(search)){
-                    console.log(this.state.items[i].name);
                     newItems.push(this.state.items[i]);
                 }
             }
@@ -45,9 +44,7 @@ export class RandomsScreen extends React.Component{
         this.setState({loading:false});
         this.setState({refresh:false});
     }
-    loadMore(){
-        var lat = -41.28666552;
-        var lon = 174.772996908;
+    async loadMore(){
         let tags=this.state.tags;
         var tgs="";
         var This=this;
@@ -57,22 +54,34 @@ export class RandomsScreen extends React.Component{
         if (tags.length>0){
             tgs += tags[tags.length-1];
         }
-        if(tgs.length>0){
-            MYAPI.getJson(options.search, {
-                lat: lat,
-                lon: lon,
-                radius:1000,
-                cuisines: tgs,
-                start: This.state.currentNumber,
-                count: 20
-            }).then(result => {
-                for (let i = 0; i < result.restaurants.length; i++) {
-                    var rest = result.restaurants[i].restaurant;
-                    This.state.items.push(rest);
+        if(tgs.length>0&&this.state.items.length%20===0){
+            await navigator.geolocation.getCurrentPosition((pos)=> {
+                    var crd = pos.coords;
+                    var lat=crd.latitude;
+                    var lon=crd.longitude;
+                    MYAPI.getJson(options.search, {
+                        lat: lat,
+                        lon: lon,
+                        radius:1000,
+                        cuisines: tgs,
+                        start: This.state.currentNumber,
+                        count: 20
+                    }).then(result => {
+                        for (let i = 0; i < result.restaurants.length; i++) {
+                            var rest = result.restaurants[i].restaurant;
+                            This.state.items.push(rest);
+                        }
+                        This.setState({items: This.state.items});
+                        This.state.currentNumber+=20;
+                    }).catch(err => console.log(err));
                 }
-                This.setState({items: This.state.items});
-                This.state.currentNumber+=20;
-            }).catch(err => console.log(err));
+                , (err)=>{
+                    console.warn(`ERROR(${err.code}): ${err.message}`);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
 
         }
     }
@@ -86,7 +95,7 @@ export class RandomsScreen extends React.Component{
                     <Text style={textStyles.blackTextSmall}>Name:</Text>
                     <Text style={textStyles.blackTextSmall}>{item.name}</Text>
                     <Text style={textStyles.blackTextSmall}>City:</Text>
-                    <Text style={textStyles.blackTextSmall}>{item.city}</Text>
+                    <Text style={textStyles.blackTextSmall}>{item.location.city}</Text>
                 </TouchableOpacity>
             </ImageBackground>
         );

@@ -50,9 +50,7 @@ export class RandomScreen extends React.Component {
         this.setState({regions:items});
     }
 
-     getRandom(){
-         var lat = -41.28666552;
-         var lon = 174.772996908;
+     async getRandom(){
          let tags=this.state.tags;
          var tgs="";
          var This=this;
@@ -64,24 +62,36 @@ export class RandomScreen extends React.Component {
          }
          if(tgs.length>0){
              var restaurants=[];
-                 MYAPI.getJson(options.search, {
-                     lat: lat,
-                     lon: lon,
-                     radius:1000,
-                     cuisines: tgs,
-                     start: 0,
-                     count: 20
-                 }).then(result => {
-                     for (let i = 0; i < result.restaurants.length; i++) {
-                         var rest = result.restaurants[i].restaurant;
-                         restaurants.push(rest);
-                     }
-                     if(restaurants.length>0) {
-                         let idx = Math.floor((Math.random() * restaurants.length));
-                         This.setState({rest: restaurants[idx]});
-                         This.props.navigation.navigate("Randoms",{items:restaurants,tags:tgs});
-                     }
-                 }).catch(err => console.log(err));
+             await navigator.geolocation.getCurrentPosition((pos)=> {
+                     var crd = pos.coords;
+                     var lat=crd.latitude;
+                     var lon=crd.longitude;
+                     MYAPI.getJson(options.search, {
+                         lat: lat,
+                         lon: lon,
+                         radius:1000,
+                         cuisines: tgs,
+                         start: 0,
+                         count: 20
+                     }).then(result => {
+                         for (let i = 0; i < result.restaurants.length; i++) {
+                             var rest = result.restaurants[i].restaurant;
+                             restaurants.push(rest);
+                         }
+                         if(restaurants.length>0) {
+                             let idx = Math.floor((Math.random() * restaurants.length));
+                             This.setState({rest: restaurants[idx]});
+                             This.props.navigation.navigate("Randoms",{items:restaurants,tags:tgs});
+                         }
+                     }).catch(err => console.log(err));
+                 }
+                 , (err)=>{
+                     console.warn(`ERROR(${err.code}): ${err.message}`);
+                 }, {
+                     enableHighAccuracy: true,
+                     timeout: 5000,
+                     maximumAge: 0
+                 });
 
          }
      }

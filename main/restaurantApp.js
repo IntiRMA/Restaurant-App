@@ -7,6 +7,7 @@ import RegisterScreen from "../pages/register";
 import {LoadingScreen} from "../pages/loading";
 import {RandomScreen} from "../pages/random";
 import ShowRestaurantScreen from "../pages/showRestaurant";
+import {RandomsScreen} from "../pages/randoms";
 
 
 const tabs=createMaterialTopTabNavigator({
@@ -32,7 +33,8 @@ const RootStack = createStackNavigator({
         Near_ME:RestaurantScreen,
         Random:RandomScreen,
         Show:ShowRestaurantScreen,
-        Tabs:tabs
+        Tabs:tabs,
+        Randoms:RandomsScreen
     },
     {
         intialRouteName: 'Loading',

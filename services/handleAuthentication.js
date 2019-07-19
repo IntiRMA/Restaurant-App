@@ -3,6 +3,7 @@ import {Alert,} from "react-native";
 import {NavigationActions, StackActions} from "react-navigation";
 import options from '../zconfig/endpoints';
 import MYAPI from '../zconfig/myApi';
+import loadFromDb from "./loadFromDb";
 
 
 class HandleAuthentication{
@@ -31,21 +32,43 @@ class HandleAuthentication{
 
     }
 
-     loadAll(props){
+    async loadAll(props){
+
+        let welli= await this.getNearBy().catch();
+        let fav=await loadFromDb.getUserFavorites().catch();
+        let items={restaurants:welli,favorites:fav};
+        props.loadA(items);
+    }
+
+    async getNearBy(){
         var itms=[];
         var lat="-41.28666552";
         var lon="174.772996908";
-        MYAPI.getJson(options.getGeocode,{
-            lat:lat, //latitude
-            lon:lon, //longitude
-        }).then(result=> {
-            for (let i = 0; i < result.nearby_restaurants.length; i++) {
-                itms.push(result.nearby_restaurants[i].restaurant);
+
+        await navigator.geolocation.getCurrentPosition((pos)=> {
+            var crd = pos.coords;
+            lat=crd.latitude;
+            lon=crd.longitude;
+            console.log("LAT "+lat);
+            MYAPI.getJson(options.getGeocode,{
+                    lat:lat, //latitude
+                    lon:lon, //longitude
+                }).then(result=> {
+                    for (let i = 0; i < result.nearby_restaurants.length; i++) {
+                        itms.push(result.nearby_restaurants[i].restaurant);
+                    }
+                }).catch(err=>console.log("LOADIN RESTS "+err));
             }
-        }).catch(err=>console.log("LOADIN RESTS "+err));
-        let welli= itms;
-        let items={restaurants:welli};
-        props.loadA(items);
+        , (err)=>{
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+        }, {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        });
+
+
+        return itms;
     }
 
     /* trys to register user*/

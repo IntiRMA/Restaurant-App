@@ -60,12 +60,9 @@ class UploadToDb{
     }
 
     /* adds restaurant to user favorites*/
-    async addToUserFavorites(city,name){
+    async addToUserFavorites(restaurant){
         let user=firebase.auth().currentUser;
-        await firebase.database().ref("users/"+user.uid+"/favorites/"+"/"+name).set({
-            name:name,
-            city:city
-        }).catch();
+        await firebase.database().ref("users/"+user.uid+"/favorites/"+"/"+restaurant.name).set(restaurant).catch();
     }
 
     async updateRating(city,name,uploader,newRating){

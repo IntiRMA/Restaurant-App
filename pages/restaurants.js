@@ -27,22 +27,32 @@ class RestaurantScreen extends React.Component{
     onSearch(search){
         return new Promise((resolve, reject) => {
             var This=this;
-            var lat = -41.28666552;
-            var lon = 174.772996908;
             var items=[];
-            console.log("SEARCHING "+search);
-            MYAPI.getJson(options.search,{
-                lat:lat,
-                lon:lon,
-                q:search
-            }).then(result=> {
-                for (let k in result.restaurants) {
-                    items.push(result.restaurants[k].restaurant);
+            navigator.geolocation.getCurrentPosition((pos)=> {
+                    var crd = pos.coords;
+                    var lat=crd.latitude;
+                    var lon=crd.longitude;
+                    console.log("LAT "+lat);
+                    MYAPI.getJson(options.search,{
+                        lat:lat,
+                        lon:lon,
+                        q:search
+                    }).then(result=> {
+                        for (let k in result.restaurants) {
+                            items.push(result.restaurants[k].restaurant);
 
+                        }
+                        This.setState({items: items,notSearch:false});
+
+                    }).catch(err=>console.log(err));
                 }
-                This.setState({items: items,notSearch:false});
-
-            }).catch(err=>console.log(err));
+                , (err)=>{
+                    console.warn(`ERROR(${err.code}): ${err.message}`);
+                }, {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
 
             resolve();
         });
@@ -65,7 +75,7 @@ class RestaurantScreen extends React.Component{
                     <Text style={tetxStyles.blackTextSmall}>Name:</Text>
                     <Text style={tetxStyles.blackTextSmall}>{item.name}</Text>
                     <Text style={tetxStyles.blackTextSmall}>City:</Text>
-                    <Text style={tetxStyles.blackTextSmall}>{item.city}</Text>
+                    <Text style={tetxStyles.blackTextSmall}>{item.location.city}</Text>
                 </TouchableOpacity>
             </ImageBackground>
         );

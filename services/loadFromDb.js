@@ -95,31 +95,10 @@ class LoadFromDb{
         }
         await firebase.database().ref("users/" + user.uid + "/favorites").once('value').then(snapshot => {
             snapshot.forEach(child => {
-                favs.push({
-                    name: child.val().name
-                })
+                favs.push(child.val())
             })
         });
-        let ret=[];
-        await firebase.database().ref("restaurants/").once('value').then(snapshot => {
-            snapshot.forEach(child => {
-                for(let i=0;i<favs.length;i++) {
-                    if(favs[i].name==child.val().name) {
-                        ret.push({
-                            name:child.val().name,
-                            city:child.val().city,
-                            tags:child.val().tags,
-                            price:child.val().price,
-                            address:child.val().address,
-                            uploadedBy:child.val().uploadedBy,
-                            uploaderId:child.val(). uploaderId,
-                            rating:child.val().rating
-                        });
-                    }
-                }
-            });
-        });
-        return ret;
+        return favs;
     }
 
     async loadCityTags(){
