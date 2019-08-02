@@ -23,7 +23,6 @@ class ShowRestaurantScreen extends React.Component{
     componentDidMount() {
 
         let favs=loadFromDb.getUserFavorites().catch();
-        this.setState({favorites:favs});
         let item = this.props.navigation.state.params.item;
         console.log(JSON.stringify(item,null,2));
         let contains=false;
@@ -36,6 +35,7 @@ class ShowRestaurantScreen extends React.Component{
             }
 
         this.setState({
+            favorites:favs,
                 favorite: true,
                 item:item,
                 loading: false,
@@ -49,10 +49,25 @@ class ShowRestaurantScreen extends React.Component{
         uploadToDb.addToUserFavorites(this.state.item).catch();
         this.setState({path:require('../resources/starFilled.png')});
         let favs=[];
+        var contains=false;
         for(let i=0;i<this.state.favorites.length;i++){
-            favs.push(this.state.favorites[i]);
+            if(this.state.favorites[i].name===this.state.item.name ){
+                contains=true;
+            }
         }
-        favs.push(this.state.item);
+        if(contains) {
+            for(let i=0;i<this.state.favorites.length;i++){
+                if(this.state.favorites[i].name===this.state.item.name ){
+                    continue;
+                }
+                favs.push(this.state.favorites[i]);
+            }
+        }else {
+            for(let i=0;i<this.state.favorites.length;i++){
+                favs.push(this.state.favorites[i]);
+            }
+            favs.push(this.state.item);
+        }
         this.props.add({favorites:favs});
     }
     render(){

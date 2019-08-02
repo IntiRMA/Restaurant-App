@@ -62,7 +62,17 @@ class UploadToDb{
     /* adds restaurant to user favorites*/
     async addToUserFavorites(restaurant){
         let user=firebase.auth().currentUser;
-        await firebase.database().ref("users/"+user.uid+"/favorites/"+"/"+restaurant.name).set(restaurant).catch();
+        var contained=false;
+        await firebase.database().ref("users/"+user.uid+"/favorites/"+"/"+restaurant.name).once("value",snapshot => {
+            if (snapshot.exists()){
+                contained=true;
+            }
+        }).catch();
+        if(contained){
+            await firebase.database().ref("users/" + user.uid + "/favorites/" + "/" + restaurant.name).remove().catch();
+        }else {
+            await firebase.database().ref("users/" + user.uid + "/favorites/" + "/" + restaurant.name).set(restaurant).catch();
+        }
     }
 
     async updateRating(city,name,uploader,newRating){

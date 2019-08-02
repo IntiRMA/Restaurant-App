@@ -21,8 +21,8 @@ class RestaurantScreen extends React.Component{
         this.renderBox.bind(this);
         this.onSearch.bind(this);
     }
-    componentDidMount() {
-        this.setState({items:this.props.items});
+    async componentDidMount() {
+        await this.setState({items:this.props.items});
     }
     onSearch(search){
         return new Promise((resolve, reject) => {
@@ -50,9 +50,20 @@ class RestaurantScreen extends React.Component{
                     console.warn(`ERROR(${err.code}): ${err.message}`);
                 }, {
                     enableHighAccuracy: true,
-                    timeout: 5000,
-                    maximumAge: 0
+                    timeout: 5000
                 });
+            MYAPI.getJson(options.search,{
+                lat:"41.2865",
+                lon:"174.7762",
+                q:search
+            }).then(result=> {
+                for (let k in result.restaurants) {
+                    items.push(result.restaurants[k].restaurant);
+
+                }
+                This.setState({items: items,notSearch:false});
+
+            }).catch(err=>console.log(err));
 
             resolve();
         });

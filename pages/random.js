@@ -13,7 +13,7 @@ export class RandomScreen extends React.Component {
             rest:{name:""},
             tags:[],
             regions:[],
-            priceindex:0,
+            priceindex:2,
             cities:[],
             prices: ['cheap', 'low', 'average', 'expensive'],
             possibleTags:[{"name":"boi","id":3}],
@@ -72,11 +72,14 @@ export class RandomScreen extends React.Component {
                          radius:1000,
                          cuisines: tgs,
                          start: 0,
-                         count: 20
+                         count: 20,
+                         sort:"cost"
                      }).then(result => {
                          for (let i = 0; i < result.restaurants.length; i++) {
                              var rest = result.restaurants[i].restaurant;
-                             restaurants.push(rest);
+                             if(rest.price_range<=This.state.priceindex) {
+                                 restaurants.push(rest);
+                             }
                          }
                          if(restaurants.length>0) {
                              let idx = Math.floor((Math.random() * restaurants.length));
@@ -89,8 +92,7 @@ export class RandomScreen extends React.Component {
                      console.warn(`ERROR(${err.code}): ${err.message}`);
                  }, {
                      enableHighAccuracy: true,
-                     timeout: 5000,
-                     maximumAge: 0
+                     timeout: 5000
                  });
 
          }

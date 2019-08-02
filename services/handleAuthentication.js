@@ -63,8 +63,7 @@ class HandleAuthentication{
             console.warn(`ERROR(${err.code}): ${err.message}`);
         }, {
             enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
+            timeout: 5000
         });
 
 
