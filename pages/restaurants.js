@@ -52,18 +52,6 @@ class RestaurantScreen extends React.Component{
                     enableHighAccuracy: true,
                     timeout: 5000
                 });
-            MYAPI.getJson(options.search,{
-                lat:"41.2865",
-                lon:"174.7762",
-                q:search
-            }).then(result=> {
-                for (let k in result.restaurants) {
-                    items.push(result.restaurants[k].restaurant);
-
-                }
-                This.setState({items: items,notSearch:false});
-
-            }).catch(err=>console.log(err));
 
             resolve();
         });
